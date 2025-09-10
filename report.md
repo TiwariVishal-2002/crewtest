@@ -1,6 +1,6 @@
 # Ramayan: A 2025 Comprehensive Report
 
-In 2025, the Ramayan continues to be a source of inspiration and study across numerous facets, from animation and virtual reality to literary analysis and global media representation. This report aims to provide a detailed overview of recent developments and research conducted on various topics related to the Ramayan, showcasing its enduring significance and evolving presence in both traditional and modern contexts.
+In 2025, the Ramayan continues to be a source of inspiration and study across numerous facets, from animation and virtual reality to literary analysis and global media representation. This report aims to provide a detailed overview of recent developments and research conducted on various topics related to the Ramayan, showcasing its enduring significance and evolving presence in both traditional and modern contexts. 
 
 ## 1. Animated Adaptations
 
