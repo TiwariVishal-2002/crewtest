@@ -1,74 +1,76 @@
-#!/usr/bin/env python
+"""Main file to run the crew with Flask endpoint."""
 import sys
 import warnings
-
 from datetime import datetime
+from pathlib import Path
+
+from flask import Flask, request, jsonify
 
 from benai.crew import Benai
-from pathlib import Path
 
 warnings.filterwarnings("ignore", category=SyntaxWarning, module="pysbd")
 
-# This main file is intended to be a way for you to run your
-# crew locally, so refrain from adding unnecessary logic into this file.
-# Replace with inputs you want to test with, it will automatically
-# interpolate any tasks and agents information
+app = Flask(__name__)
 
-def run():
-    """
-    Run the crew.
-    """
-    inputs = {
-        'topic': 'pinecode vs mem0',
-        'current_year': str(datetime.now().year)
-    }
-    
+@app.route('/run', methods=['POST'])
+def run_crew():
+    """Endpoint to run the crew."""
     try:
-        Benai().crew().kickoff(inputs=inputs)
+        data = request.get_json()
+        topic = data.get('topic', 'pinecode vs mem0')
+        inputs = {
+            'topic': topic,
+            'current_year': str(datetime.now().year)
+        }
+        result = Benai().crew().kickoff(inputs=inputs)
+        return jsonify({'result': str(result)}), 200
     except Exception as e:
-        raise Exception(f"An error occurred while running the crew: {e}")
+        return jsonify({'error': str(e)}), 500
 
-
-def train():
-    """
-    Train the crew for a given number of iterations.
-    """
-    inputs = {
-        "topic": "pinecone vs mem0",
-        'current_year': str(datetime.now().year)
-    }
+@app.route('/train', methods=['POST'])
+def train_crew():
+    """Endpoint to train the crew."""
     try:
-        Benai().crew().train(n_iterations=int(sys.argv[1]), filename=sys.argv[2], inputs=inputs)
-
-        if result:
-            output_path = Path("final_article.md")
-            output_path.write_text(str(result), encoding="utf-8")
-            print(f"\n✅ Final article saved to {output_path.resolve()}")
-
+        data = request.get_json()
+        topic = data.get('topic', 'pinecone vs mem0')
+        n_iterations = data.get('n_iterations', 10)
+        filename = data.get('filename', 'training_data.json')
+        inputs = {
+            "topic": topic,
+            'current_year': str(datetime.now().year)
+        }
+        result = Benai().crew().train(n_iterations=n_iterations, filename=filename, inputs=inputs)
+        return jsonify({'result': str(result)}), 200
     except Exception as e:
-        raise Exception(f"An error occurred while training the crew: {e}")
+        return jsonify({'error': str(e)}), 500
 
-def replay():
-    """
-    Replay the crew execution from a specific task.
-    """
+@app.route('/replay', methods=['POST'])
+def replay_crew():
+    """Endpoint to replay the crew execution."""
     try:
-        Benai().crew().replay(task_id=sys.argv[1])
-
+        data = request.get_json()
+        task_id = data.get('task_id')
+        Benai().crew().replay(task_id=task_id)
+        return jsonify({'status': 'Replay completed'}), 200
     except Exception as e:
-        raise Exception(f"An error occurred while replaying the crew: {e}")
+        return jsonify({'error': str(e)}), 500
 
-def test():
-    """
-    Test the crew execution and returns the results.
-    """
-    inputs = {
-        "topic": "pinecone vs mem0",
-        "current_year": str(datetime.now().year)
-    }
-    
+@app.route('/test', methods=['POST'])
+def test_crew():
+    """Endpoint to test the crew execution."""
     try:
-        Benai().crew().test(n_iterations=int(sys.argv[1]), eval_llm=sys.argv[2], inputs=inputs)
-
+        data = request.get_json()
+        topic = data.get('topic', 'pinecone vs mem0')
+        n_iterations = data.get('n_iterations', 10)
+        eval_llm = data.get('eval_llm', 'default_eval_llm')
+        inputs = {
+            "topic": topic,
+            "current_year": str(datetime.now().year)
+        }
+        result = Benai().crew().test(n_iterations=n_iterations, eval_llm=eval_llm, inputs=inputs)
+        return jsonify({'result': str(result)}), 200
     except Exception as e:
-        raise Exception(f"An error occurred while testing the crew: {e}")
+        return jsonify({'error': str(e)}), 500
+
+if __name__ == '__main__':
+    app.run(debug=True)
